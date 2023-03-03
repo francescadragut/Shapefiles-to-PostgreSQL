@@ -2,8 +2,7 @@ import argparse
 from sqlalchemy import create_engine
 import geopandas as gpd
 from pathlib import Path
-import psycopg2
-
+    
 
 HOST = ''
 USER = ''
@@ -13,13 +12,12 @@ INPUT_DIR = ''
 TABLE = ''
 
 ROOT_DIR = Path('.').absolute()
-SHP_DIR = ROOT_DIR.joinpath(Path('most-granular-shapefiles'))
 EXT = '.shp'
 
 
 def get_directories():
     """ Return a list of subdirectories containing shapefiles """
-    return [Path(SEARCH_DIR).joinpath(Path(f)) for f in Path(SEARCH_DIR).iterdir() if Path(f).is_dir()]
+    return [Path(SEARCH_DIR).joinpath(Path(f)) for f in Path(SEARCH_DIR).iterdir()]
     
 
 
@@ -31,8 +29,6 @@ def get_shapefiles(dir_path):
 def get_most_granular(files):
     """ Return dataframe and filename of the shapefile with highest granularity """
     max_rows = -1
-    most_granular_df = gpd.GeoDataFrame()
-    most_granular_filename = ''
     for file in files:
         file_df = gpd.read_file(file, encoding='utf-8')
         rows = len(file_df)
@@ -49,6 +45,7 @@ def geo_preprocessing(dataframe):
     return reprojected.explode(index_parts=False)
 
 
+
 def export_files(dirs):
     """ Export to PostGIS shapefile with highest granularity from the subdirectory of each country """
     engine = create_engine(f"postgresql://{USER}:{PW}@{HOST}/{DB}")
@@ -56,17 +53,8 @@ def export_files(dirs):
         files = get_shapefiles(dir)
         most_granular, table_name = get_most_granular(files)
         preprocessed = geo_preprocessing(most_granular)
-        # preprocessed.to_file(f"{SHP_DIR}/{table_name}.shp")
         preprocessed.to_postgis(f"{TABLE}", engine, if_exists='append', index=False)
         print(f"Exported {table_name} to {TABLE}")
-
-def add_primary_key(table):
-    conn = psycopg2.connect(database=f"{DB}", user=f"{USER}", password=f"{PW}", host=f"{HOST}")
-    cursor = conn.cursor()
-    sql = f'''ALTER TABLE {table} ADD ID SERIAL PRIMARY KEY;'''
-    cursor.execute(sql)
-    cursor.close()
-    conn.commit()
 
 if __name__ == "__main__":
   
@@ -82,27 +70,11 @@ if __name__ == "__main__":
     HOST = args.host
     USER = args.user
     DB = args.db
-    PW = args.pw.strip('"')
+    PW = args.pw
     INPUT_DIR = args.dir
     TABLE = args.table
 
-    print("HOST: ", HOST)
-    print("USER: ", USER)
-    print("DB: ", DB)
-    print("PW: ", PW)
-    print("INPUT_DIR: ", INPUT_DIR)
-    print("TABLE: ", TABLE)
-
-
     SEARCH_DIR = f"{ROOT_DIR}/{INPUT_DIR}"
-    print(SEARCH_DIR)
 
     dirs = get_directories()
-    export_files(dirs)
-    #add_primary_key(TABLE)
-    
-
-
-   
-
-    
+    export_files(dirs) 
