@@ -18,6 +18,6 @@ The script was originally designed to take the most granular shapefile from a su
 ## Run script
 
 Open terminal, cd to project folder and run the following command, with the input and output directory of the files:
-'''python3 main.py --host <HOST> --user <USER> --db <DATABASE> --pw <PASSWORD> --dir <INPUT-DIRECTORY> --table <OUTPUT-TABLE>'''
+`python3 main.py --host <HOST> --user <USER> --db <DATABASE> --pw <PASSWORD> --dir <INPUT-DIRECTORY> --table <OUTPUT-TABLE>`
 
 If the '''table''' does not exist in the database, the program will create it.
