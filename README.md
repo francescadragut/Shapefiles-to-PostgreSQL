@@ -4,7 +4,7 @@
 
 The script was originally designed to take the most granular shapefile from a subfolder and upload it to a table in PostgreSQL. On the original structure, the files were in many subfolders belonging to a root folder, which you pass as an argument when running the script. If you have all your data in one folder, make sure you either add it to a root folder or that you modify the code to your needs.
 
-Make sure your PostgreSQL database has the PostGIS extension enabled.
+**Make sure your PostgreSQL database has the PostGIS extension enabled.**
 
 ## Functions
 
